@@ -1,20 +1,41 @@
 #include "../include/Grafo.hpp"
-#include <iostream>
 
-Node::Node(int id, int peso)
+// Aresta
+
+Aresta::Aresta(int dest, int peso)
+{
+    this->idDestino = dest;
+    this->peso = peso;
+    this->next = nullptr;
+}
+Aresta::Aresta()
+{
+    delete this->next;
+}
+
+// Node
+
+Node::Node(int id)
 {
     this->setId(id);
-    this->setPeso(peso);
-    this->next = nullptr;
+    this->visitado = false;
+    this->inicioArestas = nullptr;
 }
 
 Node::~Node()
 {
-    if (this->next)
+    Aresta *arestaAtual = this->inicioArestas;
+    Aresta *aux;
+
+    while (arestaAtual != nullptr)
     {
-        delete this->next;
+        aux = arestaAtual->getNext();
+        delete arestaAtual;
+        arestaAtual = aux;
     }
 }
+
+// Grafo
 
 Grafo::Grafo(int v)
 {
@@ -26,7 +47,7 @@ Grafo::Grafo(int v)
     this->nodes = new Node *[v];
     for (i = 0; i < v; i++)
     {
-        this->nodes[i] = nullptr;
+        this->nodes[i] = new Node(i);
     }
 }
 
@@ -37,13 +58,7 @@ Grafo::~Grafo()
     Node *aux;
     for (i = 0; i < this->V; i++)
     {
-        atual = this->nodes[i];
-        while (atual)
-        {
-            aux = atual->getNext();
-            delete atual;
-            atual = aux;
-        }
+        delete this->nodes[i];
     }
     delete this->nodes;
 }
@@ -64,27 +79,30 @@ void Grafo::insereArestaDirecionada(int origem, int destino, int peso)
     }
 
     this->E++;
-    if (!this->nodes[origem])
+    Aresta *arestaAtual;
+
+    if (!this->nodes[origem]->getInicioArestas())
     {
-        this->nodes[origem] = new Node(destino, peso);
+        arestaAtual = new Aresta(destino, peso);
+        this->nodes[origem]->setInicioArestas(arestaAtual);
     }
     else
     {
-        Node *aux = this->nodes[origem];
+        Aresta *aux = this->nodes[origem]->getInicioArestas();
 
         while (aux->getNext() != nullptr)
         {
             aux = aux->getNext();
         }
 
-        aux->setNext(new Node(destino, peso));
+        aux->setNext(new Aresta(destino, peso));
     }
 }
 
 void Grafo::imprimeGrafo()
 {
     int i;
-    Node *aux;
+    Aresta *aux;
     for (i = 0; i < this->V; i++)
     {
         std::cout << "\n"
@@ -92,12 +110,22 @@ void Grafo::imprimeGrafo()
 
         if (this->nodes[i])
         {
-            aux = this->nodes[i];
+            aux = this->nodes[i]->getInicioArestas();
             while (aux != nullptr)
             {
-                std::cout << aux->getId() << "(peso: " << aux->getPeso() << "), ";
+                std::cout << aux->getIdDestino() << "(peso: " << aux->getPeso() << "), ";
                 aux = aux->getNext();
             }
         }
+    }
+}
+
+void Grafo::desvisitaGrafo()
+{
+    int i;
+
+    for (i = 0; i < this->V; i++)
+    {
+        this->nodes[i]->setVisitado(false);
     }
 }
