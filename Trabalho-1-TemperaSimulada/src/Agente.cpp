@@ -6,32 +6,19 @@ Agente::Agente(Grafo *a)
     int i, j;
 
     this->ambiente = a;
-    this->caminhos = new int *[this->quantVert];
-    this->custoCaminhos = new int[this->quantVert];
+    this->caminhos = new int[this->quantVert];
+    this->custoCaminho = 0;
 
     for (i = 0; i < this->quantVert; i++)
     {
-        this->custoCaminhos[i] = 0;
-        this->caminhos[i] = new int[this->quantVert];
-        for (j = 0; j < this->quantVert; j++)
-        {
-            this->caminhos[i][j] = -1;
-        }
+        this->caminhos[i] = -1;
     }
 }
 
 Agente::~Agente()
 {
-    int i;
-
-    for (i = 0; i < this->quantVert; i++)
-    {
-        delete this->caminhos[i];
-    }
-
     delete caminhos;
     delete ambiente;
-    delete custoCaminhos;
 }
 
 void Agente::resetarCaminho(int caminho)
@@ -40,86 +27,153 @@ void Agente::resetarCaminho(int caminho)
 
     for (i = 0; i < this->quantVert; i++)
     {
-        if (this->caminhos[caminho][i] == -1)
+        if (this->caminhos[i] == -1)
         {
             break;
         }
-        this->caminhos[caminho][i] = -1;
+        this->caminhos[i] = -1;
     }
 }
 
-void Agente::imprimeCaminhos()
+void Agente::imprimeCaminho()
 {
-    int i, j;
+    int i;
 
+    std::cout << "\nCaminho: ";
     for (i = 0; i < this->quantVert; i++)
     {
-        std::cout << "\nCaminho " << i << ": ";
-        for (j = 0; j < this->quantVert - 1; j++)
-        {
-            std::cout << this->caminhos[i][j] << " - ";
-        }
-        std::cout << "\nCusto: " << this->custoCaminhos[i];
+        std::cout << this->caminhos[i] << " - ";
     }
+    std::cout << "\nCusto: " << this->custoCaminho;
 }
 
 int Agente::sorteiaNumero(int limite)
 {
-    srand(time(NULL));
 
-    return rand() % limite;
+    int sorteio = rand() % limite;
+
+    printf("\n %d", sorteio);
+
+    return sorteio;
 }
 
-bool Agente::temperaSimulada(int verticeId, int iteracao)
+void Agente::atualizaCaminho(Aresta *a, Node *atual, Node *vizinho, int posicao)
 {
-    this->ambiente->setVisitado(verticeId, true);
-    this->caminhos[iteracao][0] = verticeId;
+    /*atual = vizinho;
+    a = atual->getInicioArestas();
+    ambiente->setVisitado(atual->getId(), true);
+    caminhos[posicao] = atual->getId();
 
-    int i;
+    vizinho = ambiente->getPosicao(a->getIdDestino());*/
+}
 
-    Node *vizinho = this->ambiente->getPosicao(verticeId);
-    int custo = vizinho->getPeso();
+bool Agente::temperaSimulada(int verticeId)
+{
 
-    for (i = 0; i < this->ambiente->getVertices(); i++)
+    int lim2, sorteado;
+    int i = 0;
+    int posicao = 0;
+    float prob;
+    float custo = 0;
+    float media, delta, lim;
+
+    ambiente->setVisitado(verticeId, true);
+    caminhos[posicao] = verticeId;
+
+    Node *nodeAtual = ambiente->getPosicao(verticeId);
+    Aresta *aresta = nodeAtual->getInicioArestas();
+
+    Node *vizinho = ambiente->getPosicao(aresta->getIdDestino());
+
+    while (ambiente->getVertices() - 1 != posicao)
     {
-        while (vizinho->getVisitado() == true && vizinho != nullptr)
+        while (vizinho->getVisitado() == true && aresta != nullptr)
         {
-            vizinho = vizinho->getNext();
+            aresta = aresta->getNext();
+            vizinho = ambiente->getPosicao(aresta->getIdDestino());
         }
-        if (vizinho == nullptr)
+        if (aresta == nullptr)
         {
+            // std::cout << "Aqui?\n";
             return false;
         }
 
-        if (vizinho->getPeso() <= custo / (i + 1))
+        if (custo == 0)
         {
+            custo = custo + aresta->getPeso();
+            posicao++;
+            nodeAtual = vizinho;
+            aresta = nodeAtual->getInicioArestas();
+            ambiente->setVisitado(nodeAtual->getId(), true);
+            caminhos[posicao] = nodeAtual->getId();
+
+            vizinho = ambiente->getPosicao(aresta->getIdDestino());
+            // atualizaCaminho(aresta, nodeAtual, vizinho, posicao);
+            //  std::cout << "Entrei\n";
         }
-    }
-}
-
-int *Agente::calculaCaminhos()
-{
-    int i;
-    int verticeId = 0;
-    bool completouCaminho;
-    int melhorCaminho = 0;
-
-    for (i = 0; i < this->quantVert; i++)
-    {
-        verticeId = sorteiaNumero(this->quantVert);
-        completouCaminho = temperaSimulada(verticeId, i);
-        if (completouCaminho == false)
+        else if (aresta->getPeso() <= (int)custo / posicao)
         {
-            i--;
+            custo = custo + aresta->getPeso();
+            posicao++;
+            nodeAtual = vizinho;
+            aresta = nodeAtual->getInicioArestas();
+            ambiente->setVisitado(nodeAtual->getId(), true);
+            caminhos[posicao] = nodeAtual->getId();
+
+            vizinho = ambiente->getPosicao(aresta->getIdDestino());
         }
+
         else
         {
-            if (this->custoCaminhos[melhorCaminho] >= this->custoCaminhos[i])
+            media = custo / posicao;
+            delta = media - custo;
+            std::cout << "\nDelta: " << delta;
+            std::cout << "\ni: " << i;
+            prob = std::exp((float)delta / i);
+            std::cout << "\nProbabilidade: " << prob;
+            lim = prob * 1000000;
+            lim2 = lim;
+            sorteado = sorteiaNumero(1000000);
+            if (sorteado <= lim2)
             {
-                melhorCaminho = i;
+                posicao++;
+                custo = custo + aresta->getPeso();
+                nodeAtual = vizinho;
+                aresta = nodeAtual->getInicioArestas();
+                ambiente->setVisitado(nodeAtual->getId(), true);
+                caminhos[posicao] = nodeAtual->getId();
+
+                vizinho = ambiente->getPosicao(aresta->getIdDestino());
             }
         }
+        i++;
     }
+    this->custoCaminho = custo;
+    return true;
+}
 
-    imprimeCaminhos();
+int *Agente::calculaCaminho()
+{
+
+    srand(time(NULL));
+
+    int sorteado = 0;
+    int verticeId = sorteiaNumero(this->quantVert);
+
+    temperaSimulada(verticeId);
+
+    /*while (temperaSimulada(verticeId) == false)
+    {
+
+        sorteado = sorteiaNumero(this->quantVert);
+        while (sorteado == verticeId)
+        {
+            sorteado = sorteiaNumero(this->quantVert);
+        }
+        verticeId = sorteado;
+    }*/
+
+    imprimeCaminho();
+
+    return caminhos;
 }
