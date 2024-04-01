@@ -12,6 +12,9 @@ private:
     int *caminhos;
     int custoCaminho;
     int quantVert;
+    float media;
+    int menor;
+    int maior;
 
 public:
     Agente(Grafo *a);
@@ -20,6 +23,6 @@ public:
     int sorteiaNumero(int limite);
     int *calculaCaminho();
     bool temperaSimulada(int verticeId);
-    void resetarCaminho(int caminho);
+    void resetarCaminho();
     void atualizaCaminho(Aresta *a, Node *atual, Node *vizinho, int posicao);
 };

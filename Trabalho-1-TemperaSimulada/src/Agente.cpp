@@ -8,6 +8,9 @@ Agente::Agente(Grafo *a)
     this->ambiente = a;
     this->caminhos = new int[this->quantVert];
     this->custoCaminho = 0;
+    this->media = 0;
+    this->maior = 0;
+    this->menor = 0;
 
     for (i = 0; i < this->quantVert; i++)
     {
@@ -21,7 +24,7 @@ Agente::~Agente()
     delete ambiente;
 }
 
-void Agente::resetarCaminho(int caminho)
+void Agente::resetarCaminho()
 {
     int i;
 
@@ -51,8 +54,6 @@ int Agente::sorteiaNumero(int limite)
 {
 
     int sorteio = rand() % limite;
-
-    printf("\n %d", sorteio);
 
     return sorteio;
 }
@@ -98,7 +99,7 @@ bool Agente::temperaSimulada(int verticeId)
             return false;
         }
 
-        if (custo == 0)
+        if (custo == 0 || aresta->getPeso() <= (int)custo / posicao)
         {
             custo = custo + aresta->getPeso();
             posicao++;
@@ -111,26 +112,15 @@ bool Agente::temperaSimulada(int verticeId)
             // atualizaCaminho(aresta, nodeAtual, vizinho, posicao);
             //  std::cout << "Entrei\n";
         }
-        else if (aresta->getPeso() <= (int)custo / posicao)
-        {
-            custo = custo + aresta->getPeso();
-            posicao++;
-            nodeAtual = vizinho;
-            aresta = nodeAtual->getInicioArestas();
-            ambiente->setVisitado(nodeAtual->getId(), true);
-            caminhos[posicao] = nodeAtual->getId();
-
-            vizinho = ambiente->getPosicao(aresta->getIdDestino());
-        }
 
         else
         {
             media = custo / posicao;
             delta = media - custo;
-            std::cout << "\nDelta: " << delta;
-            std::cout << "\ni: " << i;
+            // std::cout << "\nDelta: " << delta;
+            // std::cout << "\ni: " << i;
             prob = std::exp((float)delta / i);
-            std::cout << "\nProbabilidade: " << prob;
+            // std::cout << "\nProbabilidade: " << prob;
             lim = prob * 1000000;
             lim2 = lim;
             sorteado = sorteiaNumero(1000000);
@@ -157,23 +147,27 @@ int *Agente::calculaCaminho()
 
     srand(time(NULL));
 
-    int sorteado = 0;
-    int verticeId = sorteiaNumero(this->quantVert);
-
-    temperaSimulada(verticeId);
-
-    /*while (temperaSimulada(verticeId) == false)
+    for (int i = 0; i < 40; i++)
     {
+        int sorteado = 0;
+        int verticeId = sorteiaNumero(this->quantVert);
+        temperaSimulada(verticeId);
 
-        sorteado = sorteiaNumero(this->quantVert);
-        while (sorteado == verticeId)
+        if (custoCaminho > maior || i == 0)
         {
-            sorteado = sorteiaNumero(this->quantVert);
+            maior = custoCaminho;
         }
-        verticeId = sorteado;
-    }*/
+        if (custoCaminho < menor || i == 0)
+        {
+            menor = custoCaminho;
+        }
+        media = media + custoCaminho;
 
-    imprimeCaminho();
+        imprimeCaminho();
+        ambiente->desvisitaGrafo();
+    }
+    media = media / 40;
+    std::cout << "\nMaior valor: " << maior << "\nMenor valor: " << menor << "\nMedia: " << media;
 
     return caminhos;
 }
