@@ -14,11 +14,12 @@ private:
     int **populacao;
     int *custosPopulacao;
     float *probs;
+    float *intervaloProbs;
     int somaCusto;
     int quantVert;
     float media;
-    int menor;
-    int maior;
+    int menorCusto;
+    int maiorCusto;
     int quantPopulacao;
     vector<bool> visitado;
 
@@ -32,7 +33,7 @@ public:
     void resetarCaminho();
     void geraPrimeiraPopulacao(int k);
     int *reproduz(int x, int y);
-    int *mutacao(int *individuo);
+    int *mutacao(int *inividuo);
     int fitness();
     void calculaCusto(int x);
     void calculaProbs();

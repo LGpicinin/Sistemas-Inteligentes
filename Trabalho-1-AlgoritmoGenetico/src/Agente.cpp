@@ -1,16 +1,20 @@
 #include "../include/Agente.hpp"
 
+#define NUM_ITERACOES 2000
+#define TAM_POPULACAO 30
+
 Agente::Agente(Grafo *a)
 {
-    this->quantPopulacao = 10;
+    this->quantPopulacao = TAM_POPULACAO;
     this->quantVert = a->getVertices();
     this->ambiente = a;
     this->populacao = new int *[this->quantPopulacao];
     this->custosPopulacao = new int[this->quantPopulacao];
     this->probs = new float[this->quantPopulacao];
+    this->intervaloProbs = new float[this->quantPopulacao];
     this->media = 0;
-    this->maior = 0;
-    this->menor = 0;
+    this->maiorCusto = 0;
+    this->menorCusto = 0;
     this->somaCusto = 0;
 
     int i, j;
@@ -34,11 +38,12 @@ Agente::~Agente()
 {
     int i;
 
-    for (i = 0; i < this->quantVert; i++)
+    for (i = 0; i < this->quantPopulacao; i++)
     {
         delete this->populacao[i];
     }
-
+    delete intervaloProbs;
+    delete probs;
     delete populacao;
     delete ambiente;
     delete custosPopulacao;
@@ -57,6 +62,7 @@ void Agente::imprimePopulacoes()
         }
         cout << "\nCusto: " << this->custosPopulacao[i];
     }
+
     cout << "\n";
 }
 
@@ -82,19 +88,33 @@ void Agente::calculaProbs()
 {
     int i;
     float somaProbs;
+    float menorC = 0.95 * menorCusto;
+    // cout << menorC;
+    float somaC = 0;
+    float somaC2 = 0;
+    float intervalo = 0;
 
     for (i = 0; i < quantPopulacao; i++)
     {
-        probs[i] = float(float(somaCusto - custosPopulacao[i]) / float(somaCusto));
+        probs[i] = float(custosPopulacao[i] - menorC);
+        somaC = somaC + probs[i];
+        // probs[i] = float(float(somaCusto - custosPopulacao[i]) / float(somaCusto));
     }
     for (i = 0; i < quantPopulacao; i++)
     {
-        somaProbs = somaProbs + probs[i];
+        probs[i] = float(probs[i] / somaC);
+        probs[i] = float(1 - probs[i]);
+        somaC2 = somaC2 + probs[i];
+        // somaProbs = somaProbs + probs[i];
     }
     for (i = 0; i < quantPopulacao; i++)
     {
-        probs[i] = probs[i] / somaProbs;
-        // cout << "\nProbabilidade do individuo " << i << " eh " << probs[i];
+        probs[i] = float(probs[i] / somaC2);
+        // intervaloProbs[i][0] = intervalo;
+        intervaloProbs[i] = intervalo + probs[i];
+        intervalo = intervaloProbs[i];
+        // cout << "\nProbabilidade de " << i << " : " << probs[i];
+        // cout << "\nintervalo de " << i << " : " << intervaloProbs[i];
     }
 }
 
@@ -115,6 +135,14 @@ void Agente::calculaCusto(int x)
         custo = custo + aresta->getPeso();
     }
     custosPopulacao[x] = custo;
+    if (custo < menorCusto || menorCusto == 0)
+    {
+        menorCusto = custo;
+    }
+    if (custo > maiorCusto || maiorCusto == 0)
+    {
+        maiorCusto = custo;
+    }
 }
 
 void Agente::geraPrimeiraPopulacao(int k)
@@ -158,6 +186,11 @@ void Agente::geraPrimeiraPopulacao(int k)
             populacao[i][posicao] = atual->getId();
         }
         custosPopulacao[i] = custo;
+        if (custo < menorCusto || menorCusto == 0)
+        {
+            menorCusto = custo;
+        }
+
         somaCusto = somaCusto + custo;
         desvisita();
     }
@@ -213,7 +246,7 @@ int Agente::fitness()
     float prob = probs[0];
     float sorteio = (float)rand() / RAND_MAX;
 
-    while (sorteio > prob && i < quantPopulacao - 1)
+    while (intervaloProbs[i] < sorteio && i < quantPopulacao - 1)
     {
         i++;
         prob = prob + probs[i];
@@ -224,14 +257,19 @@ int Agente::fitness()
 
 void Agente::algoritmoGenetico()
 {
-    int i, j, x, y, sorteio;
-    int *individuo;
+    int i, j, x, y, sorteio, p;
+    // int *individuo = new int[quantVert];
     int **novaPopulacao = new int *[quantPopulacao];
+    int *individuo = new int[quantVert];
 
-    for (i = 0; i < 1000; i++)
+    /*for (i = 0; i < quantPopulacao; i++)
+        novaPopulacao[i] = new int[quantVert];*/
+
+    for (i = 0; i < NUM_ITERACOES; i++)
     {
         for (j = 0; j < quantPopulacao; j++)
         {
+
             x = fitness();
             y = fitness();
             while (x == y)
@@ -246,8 +284,13 @@ void Agente::algoritmoGenetico()
             }
             novaPopulacao[j] = individuo;
         }
-        populacao = novaPopulacao;
+        for (p = 0; p < quantPopulacao; p++)
+        {
+            populacao[p] = novaPopulacao[p];
+        }
         somaCusto = 0;
+        menorCusto = 0;
+        maiorCusto = 0;
         for (j = 0; j < quantPopulacao; j++)
         {
             calculaCusto(j);
@@ -264,4 +307,6 @@ void Agente::calculaCaminho()
     imprimePopulacoes();
     algoritmoGenetico();
     imprimePopulacoes();
+    media = float(somaCusto / quantPopulacao);
+    cout << "\nMaior valor: " << maiorCusto << "\nMenor valor: " << menorCusto << "\nMedia: " << media;
 }

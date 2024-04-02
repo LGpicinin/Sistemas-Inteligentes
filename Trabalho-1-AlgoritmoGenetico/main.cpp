@@ -7,6 +7,7 @@ int main()
 {
 
     Grafo *ambiente = new Grafo(29);
+    double tempo = 0.0;
 
     FILE *arq;
     char linha[120];
@@ -44,5 +45,9 @@ int main()
     // ambiente->imprimeGrafo();
 
     Agente *agente = new Agente(ambiente);
+    clock_t begin = clock();
     agente->calculaCaminho();
+    clock_t end = clock();
+    tempo = tempo + (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("\nTempo execucao: %f segundos\n", tempo);
 }
