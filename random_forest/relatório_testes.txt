@@ -1,0 +1,129 @@
+random_forest
+
+    Número máximo de camadas = número de colunas - 1
+    
+    Discretização não-supervisionada - Frequências iguais 
+
+        5 amostras por intervalo e 10 árvores
+
+                Acertos:  331
+                Erros:  169
+                Acurácia:  0.662
+
+        10 amostras por intervalo e 10 árvores
+
+                Acertos:  329
+                Erros:  171
+                Acurácia:  0.658
+
+        20 amostras por intervalo e 10 árvores
+
+                Acertos:  331
+                Erros:  169
+                Acurácia:  0.662
+
+        2 amostras por intervalo e 20 árvores
+
+                Acertos:  287
+                Erros:  213
+                Acurácia:  0.574
+
+        5 amostras por intervalo e 20 árvores
+
+                Acertos:  335
+                Erros:  165
+                Acurácia:  0.67
+
+        5 amostras por intervalo e 40 árvores
+
+                Acertos:  345
+                Erros:  155
+                Acurácia:  0.69
+
+        10 amostras por intervalo e 40 árvores
+
+                Acertos:  295
+                Erros:  205
+                Acurácia:  0.59
+
+    Discretização supervisionada baseada em entropia
+
+        Com mínimo de 2 amostras por intervalo e 5 árvores
+
+                Acertos:  282
+                Erros:  218
+                Acurácia:  0.564
+
+        Com mínimo de 2 amostras por intervalo e 10 árvores
+
+                Acertos:  300
+                Erros:  200
+                Acurácia:  0.6
+
+        Com mínimo de 5 amostras por intervalo e 10 árvores
+                  
+                Acertos:  311
+                Erros:  189
+                Acurácia:  0.622
+
+        Com mínimo de 10 amostras por intervalo e 10 árvores
+        
+                Acertos:  338
+                Erros:  162
+                Acurácia:  0.676
+
+        Com mínimo de 20 amostras por intervalo e 10 árvores
+        
+                Acertos:  327
+                Erros:  173
+                Acurácia:  0.654
+
+        Com mínimo de 2 amostras por intervalo e 20 árvores
+        
+                Acertos:  305
+                Erros:  195
+                Acurácia:  0.61
+                
+        Com mínimo de 5 amostras por intervalo e 20 árvores
+        
+                Acertos:  341
+                Erros:  159
+                Acurácia:  0.682
+
+        Com mínimo de 10 amostras por intervalo e 20 árvores
+
+                Acertos:  351
+                Erros:  149
+                Acurácia:  0.702
+
+        Com mínimo de 20 amostras por intervalo e 20 árvores
+
+                Acertos:  317
+                Erros:  183
+                Acurácia:  0.634
+
+        Com mínimo de 2 amostras por intervalo e 40 árvores
+
+                Acertos:  320
+                Erros:  180
+                Acurácia:  0.64
+
+        Com mínimo de 5 amostras por intervalo e 40 árvores
+        
+                Acertos:  341
+                Erros:  159
+                Acurácia:  0.682
+
+        Com mínimo de 10 amostras por intervalo e 40 árvores
+
+                Acertos:  306
+                Erros:  194
+                Acurácia:  0.612
+
+        Com mínimo de 20 amostras por intervalo e 40 árvores
+
+                Acertos:  295
+                Erros:  205
+                Acurácia:  0.59
+                
+                

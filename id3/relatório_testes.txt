@@ -1,0 +1,73 @@
+ID3 
+
+    Número máximo de camadas = número de colunas
+    
+    Discretização não-supervisionada - Frequências iguais 
+
+            2 intervalos:
+                Acertos:  332
+                Erros:  168
+                Acurácia:  0.664
+
+            5 intervalos
+            
+                Acertos:  323
+                Erros:  177
+                Acurácia:  0.646
+
+            10 intervalos:
+
+                Acertos:  323
+                Erros:  177
+                Acurácia:  0.646
+          
+            100 intervalos:
+      
+                Acertos:  324
+                Erros:  176
+                Acurácia:  0.648
+
+            200 intervalos:
+
+                Acertos:  341
+                Erros:  159
+                Acurácia:  0.682
+
+    Discretização supervisionada baseada em entropia
+                  
+        Com mínimo de 2 amostras por intervalo
+    
+                Acertos:  328
+                Erros:  172
+                Acurácia:  0.656
+    
+        Com mínimo de 5 amostras por intervalo
+    
+                Acertos:  334
+                Erros:  166
+                Acurácia:  0.668
+    
+        Com mínimo de 50 amostras por intervalo
+    
+                Acertos:  324
+                Erros:  176
+                Acurácia:  0.648
+    
+        Com mínimo de 75 amostras por intervalo
+    
+                Acertos:  333
+                Erros:  167
+                Acurácia:  0.666
+    
+        Com mínimo de 100 amostras por intervalo
+    
+                Acertos:  320
+                Erros:  180
+                Acurácia:  0.64
+                
+        Com mínimo de 150 amostras por intervalo
+        
+                Acertos:  321
+                Erros:  179
+                Acurácia:  0.642
+                
